@@ -1,0 +1,141 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Add a Recipe</title>
+<style>
+input.ng-valid {
+	background-color: lightgreen;
+}
+
+input.ng-dirty.ng-invalid-required,input.ng-dirty.ng-invalid-number {
+	background-color: red;
+}
+
+input.ng-dirty.ng-invalid-min {
+	background-color: yellow;
+}
+
+
+</style>
+<link rel="stylesheet" href="css/bootstrap.css" />
+<link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.js"></script>
+
+	<script>
+		/*<![CDATA[*/
+		var app = angular.module('myApp', []);
+		app.controller('addRecipeCtrl', function($scope, $http, $q) {
+			console.log("Hit!");
+
+			function addInventory(ingName, amount) {
+		        $http.put("api/v1/inventory/" + ingName + "/" + amount )
+		        	.then(
+		            function (response) {
+		            	$scope.ingredients = response.data;
+		            },
+		            function(rejection){
+		                console.error('Error while adding ingredient');
+		                console.log(rejection);
+		                
+						$scope.submissionSuccess=true;	
+		                
+		            }
+		        );
+			}
+			
+			function addInitial(name, amount) {
+		        $http.put("api/v1/inventory/" + name + "/" + amount )
+		        	.then(
+		            function (response) {
+		            	$scope.ingredients = response.data;
+		            },
+		            function(rejection){
+		                console.error('Error while adding ingredient');
+		                console.log(rejection);
+		                
+						$scope.submissionSuccess=true;	
+		                
+		            }
+		        );
+			}
+			
+			
+			$scope.add = function(){				
+				addInventory($scope.name.name, $scope.amount);
+				
+			}
+			
+			$scope.addOne = function() {
+				addInitial("initial", 0);
+			}
+
+		});
+		/*]]>*/
+	</script>
+
+
+
+	<div ng-app="myApp" class="generic-container ng-cloak"
+		ng-controller="addRecipeCtrl as ctrl">
+		
+		<h1>Inventory</h1>
+		
+		
+		<div class="panel panel-default">
+			<element ng-init="addOne()"> 
+			
+			<li ng-repeat="ingredient in ingredients"><label>
+						<span class="lead">{{ingredient.name}}: {{ingredient.amount}}</span>
+						
+			</label></li>
+			
+		</div>
+		
+		
+		
+		<div class="panel panel-default">
+			
+			<div class="panel-heading">
+				<span class="lead">   Choose Ingredient To Edit:</span>
+				
+				<select ng-model="name" ng-options="x.name for x in ingredients">
+				</select>
+				
+				<br />
+				
+				<span class="lead">   Enter Ingredient Amount To Add:</span>
+				
+				
+				<input type="number" ng-model="amount" placeholder="Enter ingredient amount" min="0"/>
+				<div ng-if="submissionSuccess">Cannot have a negative amount. Please try again</div>
+				
+			</div>
+			
+			<input type="submit" value="Update Inventory" ng-click="add()", 
+					class="btn btn-warning btn-sm" />
+					
+			
+			
+
+			<div class="formcontainer">
+				
+			</div>
+			<div ng-show="success">Recipe Created</div>
+			<div ng-show="failure">Error while adding recipe.</div>
+		</div>
+		
+		
+
+		<a href="/index">Update</a>
+		<br>
+		<a href="/index">Return</a>
+	</div>
+
+
+
+</body>
+</html>
+

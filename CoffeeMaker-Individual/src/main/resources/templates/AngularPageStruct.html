@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<!--- Header information about the page -->
+
+<body>
+	<div layout:fragment="content">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.js"></script>
+		<script>
+			/* Without these comments, Thymeleaf will try to parse the Javascript as XML and break itself sometimes */
+			/*<![CDATA[*/
+			var app = angular.module('myApp', []);
+			app.controller('populateCtrl', function ($scope, $http, $q) {
+
+				/* Logic that handles controlling your page goes here */
+				//				$scope.math = function (a, b) {
+				//					return (5 * a) - b;
+				//					};
+
+
+				//				$scope.myFunction = function () {
+				//					alert("You entered:" + $scope.math($scope.x, $scope.y));
+				//				};
+
+				$scope.branches = ["development", "frontend-data-entry", "backend", "developmentT2",
+					"developmentT1", "main", "kpresle-test", "kpresle-test-2", "frontend-display"];
+
+			});
+
+			/* Without these comments, Thymeleaf will try to parse the Javascript as XML and break itself sometimes */
+			/*]]>*/
+		</script>
+
+		<div ng-app="myApp" ng-controller="populateCtrl">
+
+			<!--- Various HTML elements, with extra tags telling Angular how to work with them, go here -->
+			<input type="text" ng-model="x" required="true" />
+			<input type="text" ng-model="y" required="true" />
+
+
+			<button ng-click="myFunction()">OK</button>
+
+			<div class="col-sm">
+				(Optional) Select the branches to view <br />
+				<div ng-repeat="branch in branches track by $index">
+					<input type="checkbox" ng-model="$parent.selectedBranches[branch]">
+					<tt> { {branch} }</tt> <!-- remove the extra spaces -->
+					</input>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+</body>
+
+</html>

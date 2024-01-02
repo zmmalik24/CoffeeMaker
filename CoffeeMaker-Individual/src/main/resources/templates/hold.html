@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Delete Recipes</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="css/bootstrap.css" />
+<link rel="stylesheet" href="css/app.css" />
+</head>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<body>
+	<script> 
+    /*<![CDATA[*/
+		var app = angular.module('myApp', []);
+		app.controller('recipesCtrl', function($scope, $http) {
+			
+			function updateRecipes() {
+				$http.get("/api/v1/recipes").then(function (response) {
+	  				$scope.recipes = response.data;
+	  			});
+			}
+			
+			function getIngredients(recipe) {
+		        $http.get("api/v1/recipes/" + recipe + "/ingredients")
+		            .then(
+		            function (response) {
+		            	$scope.ingredients = response.data;
+		            },
+		            function(rejection){
+		                console.error('Error while getting ingredients');
+		                console.log(rejection);
+		                
+						$scope.submissionSuccess=false;	
+		                
+		            }
+		        );
+			}
+			
+			$scope.get = function(){				
+				getIngredients($scope.name);
+				console.log($scope.name);
+				
+			}
+			
+			$scope.edit = function(value){				
+				editIngredient($scope.ingNameTwo.name, value);
+				
+			}
+			
+			$scope.delete = function(){				
+				deleteIngredient($scope.ingName.name);
+				
+			}
+			
+			$scope.add = function(){				
+				addIngredient($scope.newIngName, $scope.newIngAmount);
+				
+			}
+			
+			$scope.addOne = function() {
+				addInitial("initial", 0);
+			}
+			
+			function addInitial(name, amount) {
+		        $http.put("api/v1/inventory/" + name + "/" + amount )
+		        	.then(
+		            function (response) {
+		            	$scope.ingredientsInventory = response.data;
+		            },
+		            function(rejection){
+		                console.error('Error while adding ingredient');
+		                console.log(rejection);
+		                
+						$scope.submissionSuccess=true;	
+		                
+		            }
+		        );
+			}
+			
+			
+			
+			function editIngredient(ingredient, value) {
+		        $http.post("api/v1/recipes/" + $scope.name + "/" + ingredient + "/" + value )
+		        	.then(
+		            function (response) {
+		            	$scope.ingredients = response.data;
+		            	
+		            	$scope.submissionSuccess=false;
+		            },
+		            function(rejection){
+		                
+		                
+						$scope.submissionSuccess=true;	
+		                
+		            }
+		        );
+			}
+			
+			function deleteIngredient(ingredient) {
+		        $http.delete("api/v1/recipes/" + $scope.name + "/" + ingredient )
+		        	.then(
+		            function (response) {
+		            	$scope.ingredients = response.data;
+		            },
+		            function(rejection){
+		                console.error('Error while deleting ingredient');
+		                console.log(rejection);
+		                
+						$scope.submissionSuccess=false;	
+		                
+		            }
+		        );
+			}
+			
+			function addIngredient(ingName, amount) {
+		        $http.put("api/v1/recipes/" + $scope.name + "/" + ingName + "/" + amount )
+		        	.then(
+		            function (response) {
+		            	$scope.ingredients = response.data;
+		            },
+		            function(rejection){
+		                console.error('Error while adding ingredient');
+		                console.log(rejection);
+		                
+						$scope.submissionSuccess=true;	
+		                
+		            }
+		        );
+			}
+			
+  			updateRecipes();
+		});
+	/*]]>*/
+	</script>
+
+	<div layout:fragment="content" class="generic-container ng-cloak"
+		ng-app="myApp" ng-controller="recipesCtrl as ctrl">
+
+		<h1>Edit Recipes</h1>
+		
+		<div class="panel-heading">
+			<div class="panel panel-default">
+				<span class="lead"><b>Choose Recipe To Edit:</b></span>
+				<ul>
+					<li ng-repeat="recipe in recipes"><label>{{recipe.name}}
+							<input type="radio" ng-model="$parent.name" name="name"
+							value="{{recipe.name}}" required="true" />
+					</label></li>
+				</ul>
+				
+				<div ng-if="recipes.length > 0">
+					<input type="submit" value="Edit Recipe" ng-click="get()", 
+						class="btn btn-warning btn-sm" />
+				</div>
+			
+			</div>	
+			
+			
+			
+			
+		</div>
+
+		<div class="panel panel-default">
+			
+			
+
+
+			
+
+			
+				
+				<span class="lead">   <b>Choose Ingredient To Edit Or Delete:</b></span>
+				
+				<div ng-if="0 >= ingredients.length">There are no ingredients in the
+				chosen recipe.</div>
+				
+				<select ng-model="ingNameTwo" ng-options="x.name for x in ingredients">
+				</select>
+				
+				<div ng-if="0 < ingredients.length">
+					<input type="text" ng-model="x" placeholder="Enter updated amount" required="true" min="0" />
+					<br />
+					
+				
+					<input type="submit" value="Confirm Update" ng-click="edit(x)", 
+						class="btn btn-warning btn-sm" />
+						
+					<div ng-if="submissionSuccess">Cannot have a negative amount. Please try again</div>
+						
+					<input type="submit" value="Delete Ingredient" ng-click="delete()", 
+						class="btn btn-warning btn-sm" />
+						
+					<br />
+					<br />
+					<span class="lead">   <b>Add Ingredient To Chosen Recipe:</b></span>
+					<br />
+					
+					<input type="text" ng-model="newIngName" placeholder="Enter ingredient name"/>
+					
+					
+					<input type="number" ng-model="newIngAmount" placeholder="Enter ingredient amount" min="0"/>
+					<div ng-if="submissionSuccess">Cannot have a negative amount. Please try again</div>
+					
+					
+					<input type="submit" value="Add Ingredient" ng-click="add()", 
+						class="btn btn-warning btn-sm" />
+					
+					
+					
+					
+				
+				</div>
+				
+				
+				
+			
+			<br />
+			
+			
+			
+			
+					
+			<ul>
+				Quantity: 
+				<br />
+			
+				<li ng-repeat="ingredient in ingredients"><label>
+						{{ingredient.name}}: {{ingredient.amount}}
+				</label></li>
+			</ul>
+			
+
+			<div ng-if="0 >= recipes.length">There are no recipes in the
+				Coffee Maker.</div>
+			
+
+
+		</div>
+		<a href="/index">Home</a>
+	</div>
+
+
+
+</body>
+</html>
